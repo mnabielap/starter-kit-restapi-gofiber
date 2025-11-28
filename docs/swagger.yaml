@@ -1,0 +1,305 @@
+basePath: /v1
+definitions:
+  dto.AuthResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/dto.TokensResponse'
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+    type: object
+  dto.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LogoutRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  dto.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  dto.TokenDetails:
+    properties:
+      expires:
+        type: string
+      token:
+        type: string
+    type: object
+  dto.TokensResponse:
+    properties:
+      access:
+        $ref: '#/definitions/dto.TokenDetails'
+      refresh:
+        $ref: '#/definitions/dto.TokenDetails'
+    type: object
+  dto.UserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      isEmailVerified:
+        type: boolean
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Full Gofiber Boilerplate
+  title: GoFiber Starter Kit API
+  version: "1.0"
+paths:
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Forgot Password
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+      summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Logout
+      tags:
+      - Auth
+  /auth/refresh-tokens:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+      summary: Refresh Tokens
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AuthResponse'
+      summary: Register
+      tags:
+      - Auth
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Token
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Reset Password
+      tags:
+      - Auth
+  /auth/send-verification-email:
+    post:
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Send Verification Email
+      tags:
+      - Auth
+  /auth/verify-email:
+    post:
+      parameters:
+      - description: Token
+        in: query
+        name: token
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Verify Email
+      tags:
+      - Auth
+  /users:
+    get:
+      parameters:
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Role
+        in: query
+        name: role
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - Users
+    post:
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - Users
+  /users/{userId}:
+    delete:
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - Users
+    get:
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - Users
+    patch:
+      responses: {}
+      security:
+      - BearerAuth: []
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
