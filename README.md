@@ -137,16 +137,16 @@ Forget Postman! This project comes with a suite of Python scripts that automatic
 
 ```bash
 # 1. Register a user (Saves tokens to secrets.json automatically)
-python 1.auth_register.py
+python A1.auth_register.py
 
 # 2. Login (Updates tokens in secrets.json)
-python 2.auth_login.py
+python A2.auth_login.py
 
 # 3. Get User Profile (Uses the saved token)
-python 11.users_get_one.py
+python B2.users_get_one.py
 
 # 4. Refresh Token
-python 3.auth_refresh_tokens.py
+python A3.auth_refresh_tokens.py
 ```
 
 > **Note:** These scripts mimic real-world usage. You don't need to copy-paste tokens manually; the scripts manage them via `secrets.json`.
