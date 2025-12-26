@@ -32,12 +32,6 @@ func Auth(cfg *config.Config, requiredRights ...string) fiber.Handler {
 		userID, _ := uuid.Parse(claims["sub"].(string))
 		c.Locals("userId", userID)
 
-		// Simple Role Based Access Control (RBAC) mimicking original logic
-		// In a real app, you might query DB to get user Role. 
-		// Here we assume role verification happens in handler or we'd need to put role in JWT.
-		// For strict adherence to the starter kit, we verify rights against role in DB.
-		// Optimization: Put role in JWT to avoid DB call here.
-
 		return c.Next()
 	}
 }
