@@ -141,12 +141,6 @@ python A1.auth_register.py
 
 # 2. Login (Updates tokens in secrets.json)
 python A2.auth_login.py
-
-# 3. Get User Profile (Uses the saved token)
-python B2.users_get_one.py
-
-# 4. Refresh Token
-python A3.auth_refresh_tokens.py
 ```
 
 > **Note:** These scripts mimic real-world usage. You don't need to copy-paste tokens manually; the scripts manage them via `secrets.json`.

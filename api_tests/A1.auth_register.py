@@ -1,44 +1,34 @@
 import sys
 import os
+import time
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-import utils
+from utils import send_and_print, BASE_URL, save_config
 
-# Endpoint
-URL = f"{utils.BASE_URL}/auth/register"
+# Generate a unique email to avoid conflict
+unique_id = int(time.time())
+email = f"testuser_{unique_id}@example.com"
 
-# Payload
+print(f"--- REGISTERING NEW USER: {email} ---")
+
+url = f"{BASE_URL}/auth/register"
+
 payload = {
-    "name": "New User",
-    "email": "test@example.com",
-    "password": "password123"
+    "name": "Test User Automator",
+    "email": email,
+    "password": "password123",
+    "role": "user",
 }
 
-# Send Request
-response = utils.send_and_print(
-    url=URL,
+response = send_and_print(
+    url=url,
     method="POST",
     body=payload,
-    output_file=f"{os.path.splitext(os.path.basename(__file__))[0]}.json",
+    output_file=f"{os.path.splitext(os.path.basename(__file__))[0]}.json"
 )
 
-# Save Tokens and User ID to secrets.json for other scripts to use
+# Optional: Save tokens if you want to use this user immediately
 if response.status_code == 201:
     data = response.json()
-    
-    # Save Access Token
-    access_token = data.get("tokens", {}).get("access", {}).get("token")
-    if access_token:
-        utils.save_config("access_token", access_token)
-        print(">> [INFO] Access Token saved to secrets.json")
-
-    # Save Refresh Token
-    refresh_token = data.get("tokens", {}).get("refresh", {}).get("token")
-    if refresh_token:
-        utils.save_config("refresh_token", refresh_token)
-        print(">> [INFO] Refresh Token saved to secrets.json")
-
-    # Save User ID
-    user_id = data.get("user", {}).get("id")
-    if user_id:
-        utils.save_config("user_id", user_id)
-        print(">> [INFO] User ID saved to secrets.json")
+    save_config("accessToken", data['tokens']['access']['token'])
+    save_config("refreshToken", data['tokens']['refresh']['token'])
+    print(">>> Registration successful. Tokens saved to secrets.json.")
