@@ -34,16 +34,30 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 // GetUsers
 // @Tags Users
 // @Security BearerAuth
+// @Param search query string false "Search term"
+// @Param scope query string false "Search scope (all, name, email, id)"
+// @Param role query string false "Role filter"
+// @Param sortBy query string false "Sort (field:order)"
+// @Param limit query int false "Limit"
+// @Param page query int false "Page"
 // @Router /users [get]
 func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
 	page, _ := strconv.Atoi(c.Query("page", "1"))
-	name := c.Query("name")
-	role := c.Query("role")
 
-	pagination := &utils.Pagination{Limit: limit, Page: page}
-	result, err := h.Service.QueryUsers(pagination, name, role)
-	if err != nil { return c.SendStatus(fiber.StatusInternalServerError) }
+	params := dto.UserQueryParams{
+		Search: c.Query("search"),
+		Scope:  c.Query("scope", "all"),
+		Role:   c.Query("role"),
+		SortBy: c.Query("sortBy"), // e.g. "created_at:desc"
+		Limit:  limit,
+		Page:   page,
+	}
+
+	result, err := h.Service.QueryUsers(params)
+	if err != nil { 
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()}) 
+	}
 	return c.JSON(result)
 }
 

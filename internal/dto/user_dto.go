@@ -27,3 +27,13 @@ type UpdateUserRequest struct {
 	Email    string `json:"email" validate:"omitempty,email"`
 	Password string `json:"password" validate:"omitempty,min=8"`
 }
+
+// UserQueryParams holds search, filter, and sort options
+type UserQueryParams struct {
+	Search string
+	Scope  string
+	Role   string
+	SortBy string
+	Limit  int
+	Page   int
+}
