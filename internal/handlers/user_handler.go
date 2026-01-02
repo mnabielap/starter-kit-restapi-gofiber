@@ -34,10 +34,6 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 // GetUsers
 // @Tags Users
 // @Security BearerAuth
-// @Param name query string false "Name"
-// @Param role query string false "Role"
-// @Param limit query int false "Limit"
-// @Param page query int false "Page"
 // @Router /users [get]
 func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "10"))
@@ -62,12 +58,11 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	user, err := h.Service.GetUserById(id)
 	if err != nil { return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "User not found"}) }
 
-	// Authorization check: User can only see themselves unless admin
-	// Note: In real implementation, pass currentRole to check
-	// Simplification: We assume middleware RoleGuard handles strict role routes, 
-	// but for 'common' routes we check ID match.
-	if user.Role != "admin" && user.ID != currentID {
-		return c.SendStatus(fiber.StatusForbidden)
+	if user.ID != currentID {
+		requester, err := h.Service.GetUserById(currentID.String())
+		if err != nil || requester.Role != utils.RoleAdmin {
+			return c.SendStatus(fiber.StatusForbidden)
+		}
 	}
 
 	return c.JSON(user)
@@ -79,6 +74,17 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 // @Router /users/{userId} [patch]
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	id := c.Params("userId")
+	currentID := c.Locals("userId").(uuid.UUID)
+
+	// Authorization check: Prevent IDOR.
+	// Users can only update themselves. Admins can update anyone.
+	if id != currentID.String() {
+		requester, err := h.Service.GetUserById(currentID.String())
+		if err != nil || requester.Role != utils.RoleAdmin {
+			return c.SendStatus(fiber.StatusForbidden)
+		}
+	}
+
 	var req dto.UpdateUserRequest
 	if err := validator.ParseAndValidate(c, &req); err != nil { return nil }
 	

@@ -27,12 +27,12 @@ func SetupUserRoutes(router fiber.Router, h *handlers.UserHandler, cfg *config.C
 		return user.Role
 	}, utils.RoleAdmin)
 
-	// 3. Admin Only Routes
+	// 3. Admin Only Routes (Create, Read All, Delete)
 	users.Post("/", adminGuard, h.CreateUser)
 	users.Get("/", adminGuard, h.GetUsers)
+	users.Delete("/:userId", adminGuard, h.DeleteUser)
 
-	// 4. User/Admin Routes (Logic for self-access is handled inside Handler)
+	// 4. User/Admin Routes (Read One, Update)
 	users.Get("/:userId", h.GetUser)
 	users.Patch("/:userId", h.UpdateUser)
-	users.Delete("/:userId", h.DeleteUser)
 }
